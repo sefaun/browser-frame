@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Canvas Target Window</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #333;
+    }
+
+    /* Dark background for contrast */
+    canvas {
+      display: block;
+      border: 2px solid royalblue;
+      margin: 20px auto;
+    }
+
+    /* Add a border for visibility */
+    h1 {
+      color: white;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Splash Window Mirror</h1>
+  <canvas id="mirrorCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('mirrorCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Listen for the 'update-canvas-frame' event from the main process
+    // using the API exposed by the preload script.
+    window.electronAPI.onUpdateCanvasFrame((event, { buffer, width, height }) => {
+      // Ensure the canvas dimensions match the incoming image
+      canvas.width = width;
+      canvas.height = height;
+
+      // Create a Uint8ClampedArray from the buffer
+      const swappedBuffer = new Uint8ClampedArray(buffer.length);
+      for (let i = 0; i < buffer.length; i += 4) {
+        swappedBuffer[i] = buffer[i + 2];     // Red from Blue
+        swappedBuffer[i + 1] = buffer[i + 1]; // Green (stays same)
+        swappedBuffer[i + 2] = buffer[i];     // Blue from Red
+        swappedBuffer[i + 3] = buffer[i + 3]; // Alpha (stays same)
+      }
+      const imageData = new ImageData(swappedBuffer, width, height);
+
+      // Put the ImageData onto the canvas
+      ctx.putImageData(imageData, 0, 0); // Draw at (0,0)
+    });
+  </script>
+</body>
+
+</html>
