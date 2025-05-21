@@ -15,7 +15,7 @@ app.whenReady().then(() => {
       nodeIntegration: false, // Recommended for security
       contextIsolation: true, // Recommended for security
       preload: path.join(__dirname, 'splash-preload.js'), // Create this file
-      offscreen: true, // burada sihir başlıyor
+      offscreen: true, // frame alabilmek için
     },
   })
   splashWindow.loadFile('splash.html')
